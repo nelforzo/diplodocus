@@ -85,10 +85,10 @@
     </div>
 
     <div class="reader-controls" role="group" aria-label="Playback controls">
-      <button class="ctrl-btn" id="ctrl-rewind" title="Rewind to chapter start" disabled>
+      <button class="ctrl-btn" id="ctrl-restart" title="Restart chapter" aria-label="Restart chapter" disabled>
         <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <polygon points="19 20 9 12 19 4 19 20" fill="currentColor" stroke="none"/>
-          <line x1="5" y1="19" x2="5" y2="5"/>
+          <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/>
+          <path d="M3 3v5h5"/>
         </svg>
       </button>
 
@@ -99,13 +99,7 @@
         </svg>
       </button>
 
-      <button class="ctrl-btn" id="ctrl-stop" title="Stop and save position" disabled>
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-          <rect x="4" y="4" width="16" height="16" rx="2"/>
-        </svg>
-      </button>
-
-      <button class="ctrl-btn" id="ctrl-forward" title="Next chapter" disabled>
+      <button class="ctrl-btn" id="ctrl-forward" title="Next chapter" aria-label="Next chapter" disabled>
         <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
           <polygon points="5 4 15 12 5 20 5 4" fill="currentColor" stroke="none"/>
           <line x1="19" y1="5" x2="19" y2="19"/>

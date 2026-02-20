@@ -28,9 +28,8 @@ const elSentence  = document.getElementById('reader-sentence');
 const elFill      = document.getElementById('reader-progress-fill');
 const elLabel     = document.getElementById('reader-progress-label');
 const btnBack     = document.getElementById('reader-back-btn');
-const btnRewind   = document.getElementById('ctrl-rewind');
+const btnRestart  = document.getElementById('ctrl-restart');
 const btnPlay     = document.getElementById('ctrl-play');
-const btnStop     = document.getElementById('ctrl-stop');
 const btnForward  = document.getElementById('ctrl-forward');
 
 // ── Public API ────────────────────────────────────────────────
@@ -144,8 +143,7 @@ function _render(update) {
   // Enable / disable controls
   const ready = state !== 'idle' && state !== 'loading' && totalChapters > 0;
   btnPlay.disabled    = !ready;
-  btnStop.disabled    = !ready || state === 'stopped';
-  btnRewind.disabled  = !ready;
+  btnRestart.disabled = !ready;
   btnForward.disabled = !ready;
 
   readerView.dataset.state = state;
@@ -161,9 +159,7 @@ btnPlay.addEventListener('click', () => {
   else engine.play();
 });
 
-btnStop.addEventListener('click', () => engine?.stop());
-
-btnRewind.addEventListener('click', () => engine?.rewind());
+btnRestart.addEventListener('click', () => engine?.rewind());
 
 btnForward.addEventListener('click', () => engine?.forward());
 
