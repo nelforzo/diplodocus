@@ -97,6 +97,30 @@ export class TTSEngine {
     return this.#persist();
   }
 
+  /** Returns the current position and sentence text (for bookmarking). */
+  getPosition() {
+    return {
+      chapIdx:      this.#chapIdx,
+      sentIdx:      this.#sentIdx,
+      chapterTitle: this.#chapters[this.#chapIdx]?.title ?? '',
+      excerpt:      this.#cache.get(this.#chapIdx)?.[this.#sentIdx] ?? '',
+    };
+  }
+
+  /** Jump to a specific chapter and sentence; resumes playback if already playing. */
+  jumpTo(chapIdx, sentIdx) {
+    if (this.#state === 'idle' || this.#state === 'loading') return;
+    const wasPlaying = this.#state === 'playing';
+    window.speechSynthesis.cancel();
+    this.#chapIdx = Math.max(0, Math.min(chapIdx, this.#chapters.length - 1));
+    this.#sentIdx = Math.max(0, sentIdx);
+    this.#emit();
+    if (wasPlaying) {
+      this.#state = 'playing';
+      this.#advance().catch(err => this.#fail(err));
+    }
+  }
+
   /** Jump to the very beginning of the book (chapter 0, sentence 0). */
   restart() {
     const wasPlaying = this.#state === 'playing';

@@ -6,8 +6,9 @@
  */
 
 import { TTSEngine } from './tts.js';
-import { escapeHtml, coverGradient } from './utils.js';
+import { escapeHtml, coverGradient, showToast } from './utils.js';
 import { refreshCardProgress } from './library.js';
+import { saveBookmark, renderBookmarkList } from './bookmarks.js';
 
 // ── Module state ──────────────────────────────────────────────
 
@@ -27,10 +28,16 @@ const elChapter   = document.getElementById('reader-chapter-title');
 const elSentence  = document.getElementById('reader-sentence');
 const elFill      = document.getElementById('reader-progress-fill');
 const elLabel     = document.getElementById('reader-progress-label');
-const btnBack     = document.getElementById('reader-back-btn');
-const btnRestart  = document.getElementById('ctrl-restart');
-const btnPlay     = document.getElementById('ctrl-play');
-const btnForward  = document.getElementById('ctrl-forward');
+const btnBack            = document.getElementById('reader-back-btn');
+const btnRestart         = document.getElementById('ctrl-restart');
+const btnPlay            = document.getElementById('ctrl-play');
+const btnForward         = document.getElementById('ctrl-forward');
+const btnBookmarks       = document.getElementById('ctrl-bookmarks');
+const bookmarksPanel     = document.getElementById('reader-bookmarks-panel');
+const bookmarksList      = document.getElementById('bookmarks-list');
+const bookmarksEmpty     = document.getElementById('bookmarks-empty');
+const btnBookmarksAdd    = document.getElementById('bookmarks-add-btn');
+const btnBookmarksClose  = document.getElementById('bookmarks-close-btn');
 
 // ── Public API ────────────────────────────────────────────────
 
@@ -64,6 +71,9 @@ export async function openReader(book) {
   }
 
   currentBookId = book.id;
+
+  // Reset bookmarks panel
+  _closeBookmarksPanel();
 
   // Show reader, hide library
   readerView.classList.remove('hidden');
@@ -142,9 +152,10 @@ function _render(update) {
 
   // Enable / disable controls
   const ready = state !== 'idle' && state !== 'loading' && totalChapters > 0;
-  btnPlay.disabled    = !ready;
-  btnRestart.disabled = !ready;
-  btnForward.disabled = !ready;
+  btnPlay.disabled          = !ready;
+  btnRestart.disabled       = !ready;
+  btnForward.disabled       = !ready;
+  btnBookmarksAdd.disabled  = !ready;
 
   readerView.dataset.state = state;
 }
@@ -200,6 +211,37 @@ function _onKeyDown(e) {
       closeReader();
       break;
   }
+}
+
+// ── Bookmarks ─────────────────────────────────────────────────
+
+btnBookmarks.addEventListener('click', () => {
+  const isOpen = bookmarksPanel.classList.toggle('open');
+  btnBookmarks.classList.toggle('active', isOpen);
+  if (isOpen && currentBookId) _refreshBookmarkList();
+});
+
+btnBookmarksClose.addEventListener('click', _closeBookmarksPanel);
+
+btnBookmarksAdd.addEventListener('click', async () => {
+  if (!engine || !currentBookId) return;
+  const pos = engine.getPosition();
+  await saveBookmark(currentBookId, pos);
+  showToast('Bookmark saved', 'success');
+  _refreshBookmarkList();
+});
+
+function _closeBookmarksPanel() {
+  bookmarksPanel.classList.remove('open');
+  btnBookmarks.classList.remove('active');
+}
+
+function _refreshBookmarkList() {
+  if (!currentBookId) return;
+  renderBookmarkList(bookmarksList, bookmarksEmpty, currentBookId, (chapIdx, sentIdx) => {
+    engine?.jumpTo(chapIdx, sentIdx);
+    _closeBookmarksPanel();
+  }).catch(console.error);
 }
 
 // ── Helpers ───────────────────────────────────────────────────

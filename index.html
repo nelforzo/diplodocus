@@ -84,27 +84,61 @@
       </div>
     </div>
 
-    <div class="reader-controls" role="group" aria-label="Playback controls">
-      <button class="ctrl-btn" id="ctrl-restart" title="Restart chapter" aria-label="Restart chapter" disabled>
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/>
-          <path d="M3 3v5h5"/>
-        </svg>
-      </button>
+    <div class="reader-bottom">
 
-      <button class="ctrl-btn ctrl-btn-play" id="ctrl-play" title="Play" aria-label="Play" disabled>
-        <!-- icon injected by reader.js -->
-        <svg width="26" height="26" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-          <polygon points="5 3 19 12 5 21 5 3"/>
-        </svg>
-      </button>
+      <!-- Bookmarks panel — slides up when open -->
+      <div id="reader-bookmarks-panel" class="reader-bookmarks-panel">
+        <div class="bookmarks-panel-header">
+          <span class="bookmarks-panel-title">Bookmarks</span>
+          <div class="bookmarks-panel-actions">
+            <button id="bookmarks-add-btn" class="bookmarks-add-btn" disabled>
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/>
+              </svg>
+              Save position
+            </button>
+            <button id="bookmarks-close-btn" class="bookmarks-close-btn" aria-label="Close bookmarks">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true">
+                <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+        <div id="bookmarks-list" class="bookmarks-list"></div>
+        <p id="bookmarks-empty" class="bookmarks-empty">No bookmarks yet. Press "Save position" to mark where you are.</p>
+      </div>
 
-      <button class="ctrl-btn" id="ctrl-forward" title="Next chapter" aria-label="Next chapter" disabled>
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <polygon points="5 4 15 12 5 20 5 4" fill="currentColor" stroke="none"/>
-          <line x1="19" y1="5" x2="19" y2="19"/>
-        </svg>
-      </button>
+      <div class="reader-controls" role="group" aria-label="Playback controls">
+        <div class="reader-controls-main">
+          <button class="ctrl-btn" id="ctrl-restart" title="Restart book" aria-label="Restart book" disabled>
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/>
+              <path d="M3 3v5h5"/>
+            </svg>
+          </button>
+
+          <button class="ctrl-btn ctrl-btn-play" id="ctrl-play" title="Play" aria-label="Play" disabled>
+            <!-- icon injected by reader.js -->
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <polygon points="5 3 19 12 5 21 5 3"/>
+            </svg>
+          </button>
+
+          <button class="ctrl-btn" id="ctrl-forward" title="Next chapter" aria-label="Next chapter" disabled>
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <polygon points="5 4 15 12 5 20 5 4" fill="currentColor" stroke="none"/>
+              <line x1="19" y1="5" x2="19" y2="19"/>
+            </svg>
+          </button>
+        </div>
+
+        <button class="ctrl-btn ctrl-btn-side" id="ctrl-bookmarks" title="Bookmarks" aria-label="Bookmarks">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/>
+          </svg>
+        </button>
+      </div>
+
     </div>
 
   </section>

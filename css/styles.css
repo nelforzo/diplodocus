@@ -596,3 +596,178 @@ body {
 /* Sentence fade when state transitions */
 [data-state="loading"] .reader-sentence  { opacity: 0.45; }
 [data-state="stopped"] .reader-sentence  { font-style: normal; color: var(--text-muted); }
+
+/* ── Bookmarks ────────────────────────────────────────────────── */
+
+/* Wrapper that stacks the panel above the controls */
+.reader-bottom {
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Side bookmark toggle button */
+.ctrl-btn-side {
+  position: absolute;
+  right: 20px;
+  color: var(--text-muted);
+}
+.ctrl-btn-side:hover { color: var(--text); }
+.ctrl-btn-side.active { color: var(--primary); }
+
+/* Make controls relative so the side button can be absolutely placed */
+.reader-controls {
+  position: relative;
+}
+
+/* Inner wrapper keeps the three main buttons centred */
+.reader-controls-main {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* ── Bookmarks panel ──────────────────────────────────────────── */
+.reader-bookmarks-panel {
+  background: var(--surface);
+  border-top: 1px solid var(--border);
+  overflow: hidden;
+  max-height: 0;
+  transition: max-height 0.28s ease;
+}
+
+.reader-bookmarks-panel.open {
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.bookmarks-panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 16px;
+  border-bottom: 1px solid var(--border);
+  position: sticky;
+  top: 0;
+  background: var(--surface);
+  z-index: 1;
+}
+
+.bookmarks-panel-title {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.bookmarks-panel-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.bookmarks-add-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: var(--primary);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius);
+  padding: 5px 10px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.bookmarks-add-btn:hover:not(:disabled) { background: var(--primary-hover); }
+.bookmarks-add-btn:disabled { background: var(--border); cursor: not-allowed; }
+
+.bookmarks-close-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--text-muted);
+  padding: 4px;
+  border-radius: var(--radius);
+  display: flex;
+  align-items: center;
+  transition: background 0.15s;
+}
+.bookmarks-close-btn:hover { background: var(--surface-2); color: var(--text); }
+
+/* ── Bookmark list items ──────────────────────────────────────── */
+.bookmarks-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.bookmarks-empty {
+  padding: 20px 16px;
+  font-size: 0.8125rem;
+  color: var(--text-muted);
+  text-align: center;
+}
+
+.bookmark-item {
+  display: flex;
+  align-items: center;
+  padding: 10px 16px;
+  gap: 8px;
+  border-bottom: 1px solid var(--border);
+}
+.bookmark-item:last-child { border-bottom: none; }
+
+.bookmark-jump-btn {
+  flex: 1;
+  background: none;
+  border: none;
+  cursor: pointer;
+  text-align: left;
+  padding: 0;
+  min-width: 0;
+}
+
+.bookmark-meta {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  color: var(--primary);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-bottom: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.bookmark-excerpt {
+  font-size: 0.8125rem;
+  color: var(--text);
+  line-height: 1.4;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  transition: color 0.15s;
+}
+.bookmark-jump-btn:hover .bookmark-excerpt { color: var(--primary); }
+
+.bookmark-delete-btn {
+  flex-shrink: 0;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--text-muted);
+  padding: 6px;
+  border-radius: var(--radius);
+  display: flex;
+  align-items: center;
+  opacity: 0;
+  transition: opacity 0.15s, color 0.15s, background 0.15s;
+}
+.bookmark-item:hover .bookmark-delete-btn { opacity: 1; }
+.bookmark-delete-btn:hover { color: #dc2626; background: #fee2e2; }
+
+/* On touch screens the delete button is always faintly visible */
+@media (pointer: coarse) {
+  .bookmark-delete-btn { opacity: 0.4; }
+}

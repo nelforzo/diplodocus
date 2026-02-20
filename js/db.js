@@ -8,12 +8,18 @@ db.version(1).stores({
 
 db.version(2).stores({
   books:    '++id, title, author, filename, fileSize, addedAt',
-  // bookId + spineIndex indexed for ordered chapter queries per book
   chapters: '++id, bookId, spineIndex',
 });
 
+db.version(3).stores({
+  books:     '++id, title, author, filename, fileSize, addedAt',
+  chapters:  '++id, bookId, spineIndex',
+  bookmarks: '++id, bookId',
+});
+
 // Non-indexed fields (stored but not queryable):
-//   books:    coverBlob, chapterCount
-//   chapters: title, href
+//   books:     coverBlob, chapterCount
+//   chapters:  title, href
+//   bookmarks: chapIdx, sentIdx, chapterTitle, excerpt, addedAt
 
 export default db;
