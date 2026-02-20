@@ -36,7 +36,7 @@ export async function loadChapterSentences(bookId, href) {
   if (!epubBlob) throw new Error(`Book ${bookId} not found in storage`);
 
   const zip = await JSZip.loadAsync(epubBlob);
-  const entry = zip.file(href);
+  const entry = findZipEntry(zip, href);
   if (!entry) throw new Error(`Chapter not found in EPUB: ${href}`);
 
   const html = await entry.async('text');
@@ -44,6 +44,46 @@ export async function loadChapterSentences(bookId, href) {
 
   // Each paragraph is tokenized; results are flattened into a single sentence list.
   return paragraphs.flatMap(tokenizeSentences);
+}
+
+/**
+ * Locates a zip entry by href, falling back gracefully when the stored path
+ * was corrupted by an older version of resolveHref.
+ *
+ * Fallback strategies (tried in order):
+ *   1. Exact match — the happy path for books imported after the path fix.
+ *   2. URL-decoded match — handles stored paths with %20 etc. not yet decoded.
+ *   3. Suffix match — handles paths that were truncated (e.g. "enson,..." instead
+ *      of "Stephenson,...") or stored with a leading slash ("/ch1.htm").
+ *      Matches the first HTML/XHTML entry whose lowercased path ends with the
+ *      lowercased decoded href (stripped of a leading slash if present).
+ *
+ * @param {JSZip} zip
+ * @param {string} href
+ * @returns {JSZip.JSZipObject|null}
+ */
+function findZipEntry(zip, href) {
+  // 1. Exact match
+  const exact = zip.file(href);
+  if (exact) return exact;
+
+  // 2. URL-decoded match (stored as "OEBPS/Ste%20phenson.htm" → "OEBPS/Stephenson.htm")
+  let decoded;
+  try { decoded = decodeURIComponent(href); } catch { decoded = href; }
+  if (decoded !== href) {
+    const byDecoded = zip.file(decoded);
+    if (byDecoded) return byDecoded;
+  }
+
+  // 3. Suffix match across all HTML/XHTML entries
+  // Strip a leading slash before comparing so "/ch1.htm" matches "OEBPS/ch1.htm"
+  const needle = decoded.replace(/^\//, '').toLowerCase();
+  const htmlEntries = zip.file(/\.(x?html?|xml)$/i);
+  for (const entry of htmlEntries) {
+    if (entry.name.toLowerCase().endsWith(needle)) return entry;
+  }
+
+  return null;
 }
 
 // ── Text extraction ───────────────────────────────────────────
