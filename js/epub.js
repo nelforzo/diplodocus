@@ -216,15 +216,19 @@ async function readManifestItem(zip, item, opfDir) {
 
 /**
  * Resolves an href relative to a base directory (zip path like "OEBPS/").
- * Uses the URL API for correct handling of "../" etc.
- * Returns the full zip-relative path (no leading slash).
+ * Uses the URL API for correct handling of "../" and absolute paths.
+ * Returns the full zip-relative path (no leading slash, not URL-encoded).
+ *
+ * Uses http://x/ as a dummy base because "http" is a well-defined "special"
+ * scheme — unlike custom schemes (e.g. "epub://"), browsers parse it
+ * consistently, with the hostname in the host field and path starting at "/".
  */
 function resolveHref(baseDir, href) {
   const decoded = decodeURIComponent(href);
   try {
-    const url = new URL(decoded, `epub://root/${baseDir}`);
-    // pathname starts with "/", strip it and the leading "root/"
-    return url.pathname.slice('/root/'.length);
+    const url = new URL(decoded, `http://x/${baseDir}`);
+    // pathname is always "/<baseDir>/..." — strip the leading "/"
+    return decodeURIComponent(url.pathname.slice(1));
   } catch {
     return baseDir + decoded;
   }

@@ -89,6 +89,14 @@ export class TTSEngine {
     this.#persist().catch(console.error);
   }
 
+  /**
+   * Persist current position without changing playback state.
+   * Called externally on page-hide / visibility-change events.
+   */
+  savePosition() {
+    return this.#persist();
+  }
+
   /** Jump to the first sentence of the current chapter. */
   rewind() {
     const wasPlaying = this.#state === 'playing';
@@ -132,7 +140,17 @@ export class TTSEngine {
     try {
       sentences = await this.#loadSentences(this.#chapIdx);
     } catch (err) {
-      throw new Error(`Failed to load chapter ${this.#chapIdx}: ${err.message}`);
+      // Chapter failed to load — skip it rather than halting playback
+      console.warn(`Skipping chapter ${this.#chapIdx} (${err.message})`);
+      if (this.#chapIdx < this.#chapters.length - 1) {
+        this.#chapIdx++;
+        this.#sentIdx = 0;
+        this.#emit();
+        return this.#advance();
+      }
+      this.#state = 'stopped';
+      this.#emit();
+      return;
     }
 
     // Chapter exhausted → advance to the next
@@ -162,6 +180,9 @@ export class TTSEngine {
       if (this.#state !== 'playing') return;
       this.#sentIdx++;
       this.#emit();
+      // Throttled auto-save: persist every 5 sentences so a sudden
+      // tab-close loses at most a few sentences of progress.
+      if (this.#sentIdx % 5 === 0) this.#persist().catch(console.error);
       this.#advance().catch(err => this.#fail(err));
     });
 

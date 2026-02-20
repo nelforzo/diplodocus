@@ -14,16 +14,12 @@ export function createBookCard(book) {
   card.className = 'book-card';
   card.dataset.id = book.id;
 
-  const chapterLabel = book.chapterCount > 0
-    ? `<div class="book-chapters">${book.chapterCount} ch.</div>`
-    : '';
-
   card.innerHTML = `
     <div class="book-cover-wrap">${buildCoverHtml(book)}</div>
     <div class="book-info">
       <div class="book-title">${escapeHtml(book.title)}</div>
       <div class="book-author">${escapeHtml(book.author)}</div>
-      ${chapterLabel}
+      <div class="book-progress-label">${buildProgressLabel(book)}</div>
     </div>
     <button class="book-remove-btn" title="Remove from library" aria-label="Remove ${escapeHtml(book.title)} from library">
       <svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
@@ -47,21 +43,46 @@ export function createBookCard(book) {
 }
 
 function buildCoverHtml(book) {
+  const progressBar = buildProgressBar(book);
+
   if (book.coverBlob) {
     const url = URL.createObjectURL(book.coverBlob);
     _objectUrls.set(book.id, url);
-    return `<img class="book-cover" src="${url}" alt="${escapeHtml(book.title)} cover" loading="lazy" decoding="async">`;
+    return `<img class="book-cover" src="${url}" alt="${escapeHtml(book.title)} cover" loading="lazy" decoding="async">${progressBar}`;
   }
 
   const gradient = coverGradient(book.title);
-  const letter = escapeHtml((book.title || '?').charAt(0).toUpperCase());
-  const snippet = escapeHtml(book.title);
+  const letter   = escapeHtml((book.title || '?').charAt(0).toUpperCase());
+  const snippet  = escapeHtml(book.title);
   return `
     <div class="book-cover-placeholder" style="background:${gradient}">
       <span class="cover-letter">${letter}</span>
       <span class="cover-title-snippet">${snippet}</span>
     </div>
-  `;
+    ${progressBar}`;
+}
+
+/** Returns a thin progress bar element or empty string. */
+function buildProgressBar(book) {
+  const pct = _progressPct(book);
+  return pct > 0 ? `<div class="book-cover-progress" style="width:${pct.toFixed(1)}%"></div>` : '';
+}
+
+/** "Ch. X of Y" when started, "Y chapters" when unread, '' otherwise. */
+function buildProgressLabel(book) {
+  const { lastChapterIndex, chapterCount } = book;
+  if (chapterCount > 0 && lastChapterIndex !== undefined) {
+    return `Ch. ${lastChapterIndex + 1} of ${chapterCount}`;
+  }
+  if (chapterCount > 0) return `${chapterCount} chapters`;
+  return '';
+}
+
+/** Percentage of chapters read (0–100), based on lastChapterIndex. */
+function _progressPct(book) {
+  const { lastChapterIndex, chapterCount } = book;
+  if (!chapterCount || lastChapterIndex === undefined) return 0;
+  return Math.min(100, (lastChapterIndex / chapterCount) * 100);
 }
 
 async function confirmRemove(book) {
@@ -94,4 +115,36 @@ export function updateEmptyState() {
   const hasBooks = grid.children.length > 0;
   grid.classList.toggle('hidden', !hasBooks);
   empty.classList.toggle('hidden', hasBooks);
+}
+
+/**
+ * Updates the progress bar and label on a library card after a reading session.
+ * Called by reader.js when the reader closes.
+ *
+ * @param {number} bookId
+ * @param {{ chapIdx: number, totalChapters: number }} update
+ */
+export function refreshCardProgress(bookId, { chapIdx, totalChapters }) {
+  const card = document.querySelector(`.book-card[data-id="${bookId}"]`);
+  if (!card) return;
+
+  const pct = totalChapters > 0 ? Math.min(100, (chapIdx / totalChapters) * 100) : 0;
+
+  // Update or create progress bar on the cover
+  let bar = card.querySelector('.book-cover-progress');
+  if (pct > 0) {
+    if (bar) {
+      bar.style.width = `${pct.toFixed(1)}%`;
+    } else {
+      card.querySelector('.book-cover-wrap')
+        ?.insertAdjacentHTML('beforeend',
+          `<div class="book-cover-progress" style="width:${pct.toFixed(1)}%"></div>`);
+    }
+  }
+
+  // Update progress label
+  const label = card.querySelector('.book-progress-label');
+  if (label && totalChapters > 0) {
+    label.textContent = `Ch. ${chapIdx + 1} of ${totalChapters}`;
+  }
 }

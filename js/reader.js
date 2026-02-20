@@ -7,13 +7,16 @@
 
 import { TTSEngine } from './tts.js';
 import { escapeHtml, coverGradient } from './utils.js';
+import { refreshCardProgress } from './library.js';
 
 // ── Module state ──────────────────────────────────────────────
 
-let engine    = null;
-let coverUrl  = null;
-let lastState = 'idle';
-let kbAbort   = null;   // AbortController for keyboard listener
+let engine         = null;
+let coverUrl       = null;
+let lastState      = 'idle';
+let kbAbort        = null;   // AbortController for keyboard listener
+let currentBookId  = null;   // id of the book currently open
+let lastUpdate     = null;   // most recent onUpdate payload from engine
 
 // ── DOM refs ──────────────────────────────────────────────────
 
@@ -61,6 +64,8 @@ export async function openReader(book) {
       </div>`;
   }
 
+  currentBookId = book.id;
+
   // Show reader, hide library
   readerView.classList.remove('hidden');
   document.getElementById('main').classList.add('hidden');
@@ -85,20 +90,32 @@ export async function openReader(book) {
 
 /** Stops playback, saves position, and returns to the library. */
 export function closeReader() {
+  // Capture final update before destroying — stop() triggers one last emit
   engine?.stop();
+  const finalUpdate = lastUpdate;
+  const bookId      = currentBookId;
+
   _destroyEngine();
   _releaseCover();
   kbAbort?.abort();
-  kbAbort = null;
+  kbAbort       = null;
+  currentBookId = null;
 
   readerView.classList.add('hidden');
   document.getElementById('main').classList.remove('hidden');
   document.querySelector('.app-header').classList.remove('hidden');
+
+  // Reflect the new position on the library card immediately
+  if (bookId && finalUpdate?.totalChapters > 0) {
+    refreshCardProgress(bookId, finalUpdate);
+  }
 }
 
 // ── Engine → UI ───────────────────────────────────────────────
 
-function _render({ state, chapIdx, sentIdx, totalChapters, chapterTitle, currentSentence }) {
+function _render(update) {
+  lastUpdate = update;
+  const { state, chapIdx, sentIdx, totalChapters, chapterTitle, currentSentence } = update;
   lastState = state;
 
   // Chapter title / sentence
@@ -150,6 +167,21 @@ btnRewind.addEventListener('click', () => engine?.rewind());
 
 btnForward.addEventListener('click', () => engine?.forward());
 
+// ── Unload / visibility saving ────────────────────────────────
+// Save position whenever the page is hidden (tab switch, close, minimize).
+// Uses savePosition() which persists without changing playback state,
+// so the TTS can resume naturally if the page comes back (e.g. tab switch).
+
+function _saveOnHide() {
+  if (!engine || lastState === 'idle' || lastState === 'loading' || lastState === 'stopped') return;
+  engine.savePosition().catch(console.error);
+}
+
+window.addEventListener('pagehide', _saveOnHide);
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState === 'hidden') _saveOnHide();
+});
+
 // ── Keyboard shortcuts ────────────────────────────────────────
 
 function _onKeyDown(e) {
@@ -178,8 +210,9 @@ function _onKeyDown(e) {
 
 function _destroyEngine() {
   engine?.destroy();
-  engine    = null;
-  lastState = 'idle';
+  engine     = null;
+  lastState  = 'idle';
+  lastUpdate = null;
 }
 
 function _releaseCover() {

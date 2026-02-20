@@ -49,6 +49,8 @@ Diplodocus is a browser-based EPUB reader with a twist: instead of displaying th
 - [x] `TTSEngine` class — sentence-queue TTS player with position memory
 - [x] Reader screen — full-screen player view with cover, chapter info, progress
 - [x] Playback controls (Rewind / Play-Pause / Stop / Forward) + keyboard shortcuts
+- [x] Position persistence — saves on stop, every 5 sentences, and on page hide
+- [x] Library cards show reading progress (bar + "Ch. X of Y" label)
 
 ---
 
@@ -82,12 +84,16 @@ A dedicated screen that opens when a book is tapped from the library.
 - [x] Current sentence displayed as narration progresses
 - [x] Keyboard shortcuts: Space (play/pause), ← (rewind), → (forward), Esc (close)
 
-### Phase 5 — Position persistence
+### Phase 5 — Position persistence ✓
 Never lose your place.
 
-- [ ] Save `{ chapterIndex, sentenceIndex }` to IndexedDB on Stop and on page unload
-- [ ] Restore position automatically when a book is reopened
-- [ ] Show progress indicator per book on the library card (e.g. "Chapter 4 of 12")
+- [x] Save position on `stop()` (explicit) and every 5 sentences (throttled auto-save)
+- [x] Save on `pagehide` and `visibilitychange → hidden` without stopping playback
+- [x] Restore saved `{ chapterIndex, sentenceIndex }` automatically on book open
+- [x] Chapter progress bar on every library card (thin line at the bottom of the cover)
+- [x] "Ch. X of Y" label per card, updated live when the reader closes
+- [x] Bug fix: `resolveHref` now uses `http://x/` base so path resolution is correct
+      across all browsers and handles absolute hrefs (e.g. `/cvi.htm`) and `../` paths
 
 ### Phase 6 — Playback settings
 - [ ] Voice selector (list available `SpeechSynthesisVoice` entries)
