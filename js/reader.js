@@ -159,7 +159,7 @@ btnPlay.addEventListener('click', () => {
   else engine.play();
 });
 
-btnRestart.addEventListener('click', () => engine?.rewind());
+btnRestart.addEventListener('click', () => engine?.restart());
 
 btnForward.addEventListener('click', () => engine?.forward());
 

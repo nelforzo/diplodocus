@@ -97,6 +97,19 @@ export class TTSEngine {
     return this.#persist();
   }
 
+  /** Jump to the very beginning of the book (chapter 0, sentence 0). */
+  restart() {
+    const wasPlaying = this.#state === 'playing';
+    window.speechSynthesis.cancel();
+    this.#chapIdx = 0;
+    this.#sentIdx = 0;
+    this.#emit();
+    if (wasPlaying) {
+      this.#state = 'playing';
+      this.#advance().catch(err => this.#fail(err));
+    }
+  }
+
   /** Jump to the first sentence of the current chapter. */
   rewind() {
     const wasPlaying = this.#state === 'playing';
