@@ -46,6 +46,9 @@ Diplodocus is a browser-based EPUB reader with a twist: instead of displaying th
 - [x] EPUB spine + TOC parsing (EPUB 2 NCX and EPUB 3 nav)
 - [x] HTML text extraction (block-level DOM traversal)
 - [x] Sentence tokenizer with abbreviation and decimal protection
+- [x] `TTSEngine` class — sentence-queue TTS player with position memory
+- [x] Reader screen — full-screen player view with cover, chapter info, progress
+- [x] Playback controls (Rewind / Play-Pause / Stop / Forward) + keyboard shortcuts
 
 ---
 
@@ -60,21 +63,24 @@ Parse the readable content out of an EPUB so the TTS engine has clean text to wo
 - [x] Tokenise each chapter into sentences (splitting on `.`, `?`, `!` with edge-case handling)
 - [x] Store the parsed chapter list in IndexedDB (`chapters` table, keyed by `bookId`)
 
-### Phase 3 — TTS reader engine
+### Phase 3 — TTS reader engine ✓
 Wrap the Web Speech API into a reliable, stateful playback engine.
 
-- [ ] Sentence-queue player using `SpeechSynthesisUtterance`
-- [ ] Handle browser quirks (Chrome utterance length limit, iOS pause/resume bugs)
-- [ ] Chapter boundary detection — advance automatically when a chapter ends
-- [ ] Expose a clean API: `play()`, `pause()`, `stop()`, `seek(chapter, sentence)`
+- [x] Sentence-queue player using `SpeechSynthesisUtterance` (one utterance at a time)
+- [x] Pause implemented as `cancel()` + remembered position (avoids Chrome 15s resume bug)
+- [x] Chapter boundary detection — advances automatically when a chapter ends
+- [x] `TTSEngine` class: `play()`, `pause()`, `stop()`, `rewind()`, `forward()`, `destroy()`
+- [x] Sentence cache per chapter; next chapter pre-warmed while current plays
+- [x] Position auto-saved to IndexedDB on `stop()` and book completion
 
-### Phase 4 — Reader screen & controls
+### Phase 4 — Reader screen & controls ✓
 A dedicated screen that opens when a book is tapped from the library.
 
-- [ ] Reader route / view (no page reload — swap views in JS)
-- [ ] Playback controls: Rewind, Play/Pause, Stop, Forward
-- [ ] Display current chapter title and overall book progress
-- [ ] Visual sentence highlight or scrolling transcript (optional, secondary to audio)
+- [x] Full-screen reader view (no page reload — swap views with show/hide)
+- [x] Playback controls: Rewind, Play/Pause, Stop, Forward
+- [x] Current chapter title and chapter X of Y progress bar
+- [x] Current sentence displayed as narration progresses
+- [x] Keyboard shortcuts: Space (play/pause), ← (rewind), → (forward), Esc (close)
 
 ### Phase 5 — Position persistence
 Never lose your place.

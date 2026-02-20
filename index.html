@@ -54,6 +54,67 @@
     <div id="book-grid" class="book-grid hidden"></div>
   </main>
 
+  <!-- ── Reader view ─────────────────────────────────────────── -->
+  <section id="reader-view" class="reader-view hidden" aria-label="Book reader">
+
+    <header class="reader-header">
+      <button class="reader-back-btn" id="reader-back-btn" aria-label="Back to library">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <polyline points="15 18 9 12 15 6"/>
+        </svg>
+        Library
+      </button>
+      <div class="reader-header-title" id="reader-book-title"></div>
+      <div class="reader-header-spacer" aria-hidden="true"></div>
+    </header>
+
+    <div class="reader-body">
+      <div class="reader-cover" id="reader-cover"></div>
+
+      <div class="reader-info">
+        <div class="reader-chapter-title" id="reader-chapter-title"></div>
+        <p class="reader-sentence" id="reader-sentence"></p>
+      </div>
+
+      <div class="reader-progress-wrap">
+        <div class="reader-progress-track" role="progressbar" aria-label="Chapter progress">
+          <div class="reader-progress-fill" id="reader-progress-fill"></div>
+        </div>
+        <div class="reader-progress-label" id="reader-progress-label"></div>
+      </div>
+    </div>
+
+    <div class="reader-controls" role="group" aria-label="Playback controls">
+      <button class="ctrl-btn" id="ctrl-rewind" title="Rewind to chapter start" disabled>
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <polygon points="19 20 9 12 19 4 19 20" fill="currentColor" stroke="none"/>
+          <line x1="5" y1="19" x2="5" y2="5"/>
+        </svg>
+      </button>
+
+      <button class="ctrl-btn ctrl-btn-play" id="ctrl-play" title="Play" aria-label="Play" disabled>
+        <!-- icon injected by reader.js -->
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+          <polygon points="5 3 19 12 5 21 5 3"/>
+        </svg>
+      </button>
+
+      <button class="ctrl-btn" id="ctrl-stop" title="Stop and save position" disabled>
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+          <rect x="4" y="4" width="16" height="16" rx="2"/>
+        </svg>
+      </button>
+
+      <button class="ctrl-btn" id="ctrl-forward" title="Next chapter" disabled>
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <polygon points="5 4 15 12 5 20 5 4" fill="currentColor" stroke="none"/>
+          <line x1="19" y1="5" x2="19" y2="19"/>
+        </svg>
+      </button>
+    </div>
+
+  </section>
+
   <!-- Full-page drag overlay -->
   <div id="drag-overlay" class="drag-overlay hidden" aria-hidden="true">
     <div class="drag-overlay-inner">

@@ -3,6 +3,7 @@ import { storeBook } from './storage.js';
 import { parseEpubMetadata } from './epub.js';
 import { createBookCard, updateEmptyState } from './library.js';
 import { showToast } from './utils.js';
+import { openReader } from './reader.js';
 
 // ── Bootstrap ─────────────────────────────────────────────────
 
@@ -10,6 +11,11 @@ async function init() {
   await loadLibrary();
   setupImportTriggers();
   setupDragAndDrop();
+
+  // Book card → reader
+  document.addEventListener('open-book', e => {
+    openReader(e.detail).catch(console.error);
+  });
 }
 
 // ── Library loading ───────────────────────────────────────────

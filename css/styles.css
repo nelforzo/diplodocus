@@ -383,3 +383,204 @@ body {
 
 /* ── Utilities ───────────────────────────────────────────────── */
 .hidden { display: none !important; }
+
+/* ═══════════════════════════════════════════════════════════════
+   READER VIEW
+   ══════════════════════════════════════════════════════════════ */
+
+.reader-view {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  background: var(--bg);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* ── Reader header ───────────────────────────────────────────── */
+.reader-header {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  height: 56px;
+  display: flex;
+  align-items: center;
+  padding: 0 16px;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.reader-back-btn {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--primary);
+  padding: 6px 8px;
+  border-radius: var(--radius);
+  white-space: nowrap;
+  transition: background 0.15s;
+}
+.reader-back-btn:hover { background: var(--primary-light); }
+
+.reader-header-title {
+  flex: 1;
+  text-align: center;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Spacer mirrors the back button width so the title stays centered */
+.reader-header-spacer { width: 88px; flex-shrink: 0; }
+
+/* ── Reader body ─────────────────────────────────────────────── */
+.reader-body {
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 32px 24px 24px;
+  gap: 28px;
+}
+
+/* ── Cover art ───────────────────────────────────────────────── */
+.reader-cover {
+  width: min(180px, 40vw);
+  aspect-ratio: 2 / 3;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.18);
+  flex-shrink: 0;
+}
+
+.reader-cover img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.reader-cover-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.reader-cover-letter {
+  font-size: 4rem;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.9);
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+  line-height: 1;
+}
+
+/* ── Text display ────────────────────────────────────────────── */
+.reader-info {
+  text-align: center;
+  max-width: 540px;
+  width: 100%;
+}
+
+.reader-chapter-title {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--primary);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin-bottom: 14px;
+}
+
+.reader-sentence {
+  font-size: 1.125rem;
+  line-height: 1.7;
+  color: var(--text);
+  font-style: italic;
+  min-height: 4.5em;
+  transition: opacity 0.15s ease;
+}
+
+/* ── Chapter progress ────────────────────────────────────────── */
+.reader-progress-wrap {
+  width: 100%;
+  max-width: 360px;
+}
+
+.reader-progress-track {
+  background: var(--border);
+  height: 4px;
+  border-radius: 100px;
+  overflow: hidden;
+  margin-bottom: 8px;
+}
+
+.reader-progress-fill {
+  height: 100%;
+  background: var(--primary);
+  border-radius: 100px;
+  width: 0%;
+  transition: width 0.6s ease;
+}
+
+.reader-progress-label {
+  text-align: center;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+/* ── Playback controls ───────────────────────────────────────── */
+.reader-controls {
+  background: var(--surface);
+  border-top: 1px solid var(--border);
+  padding: 16px 32px 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  flex-shrink: 0;
+}
+
+.ctrl-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--text);
+  padding: 10px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s, color 0.15s, transform 0.1s;
+}
+
+.ctrl-btn:hover:not(:disabled)  { background: var(--surface-2); }
+.ctrl-btn:active:not(:disabled) { transform: scale(0.88); }
+.ctrl-btn:disabled {
+  color: var(--border);
+  cursor: not-allowed;
+}
+
+/* Larger play/pause button */
+.ctrl-btn-play {
+  width: 64px;
+  height: 64px;
+  background: var(--primary);
+  color: #fff;
+  border-radius: 50%;
+  margin: 0 8px;
+}
+.ctrl-btn-play:hover:not(:disabled) { background: var(--primary-hover); }
+.ctrl-btn-play:disabled { background: var(--border); }
+
+/* Sentence fade when state transitions */
+[data-state="loading"] .reader-sentence  { opacity: 0.45; }
+[data-state="stopped"] .reader-sentence  { font-style: normal; color: var(--text-muted); }

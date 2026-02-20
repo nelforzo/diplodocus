@@ -37,6 +37,12 @@ export function createBookCard(book) {
     confirmRemove(book);
   });
 
+  // Clicking anywhere else opens the reader
+  card.addEventListener('click', (e) => {
+    if (e.target.closest('.book-remove-btn')) return;
+    card.dispatchEvent(new CustomEvent('open-book', { bubbles: true, detail: book }));
+  });
+
   return card;
 }
 
