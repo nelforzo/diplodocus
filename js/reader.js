@@ -92,8 +92,8 @@ export async function openReader(book) {
   kbAbort = new AbortController();
   document.addEventListener('keydown', _onKeyDown, { signal: kbAbort.signal });
 
-  // Apply persisted playback settings
-  const s = loadSettings();
+  // Apply persisted playback settings (per-book, falling back to global defaults)
+  const s = loadSettings(book.id);
   engine = new TTSEngine(_render);
   engine.rate  = s.rate;
   engine.pitch = s.pitch;
@@ -230,7 +230,7 @@ btnSettings.addEventListener('click', () => {
   btnSettings.classList.toggle('active', isOpen);
   if (isOpen) {
     _closeBookmarksPanel();
-    renderSettingsPanel(settingsPanel, engine);
+    renderSettingsPanel(settingsPanel, engine, currentBookId);
   }
 });
 
